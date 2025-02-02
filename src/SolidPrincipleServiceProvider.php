@@ -25,11 +25,12 @@ class SolidPrincipleServiceProvider extends ServiceProvider
       $this->loadViewsFrom(__DIR__.'/../resources/view', 'solid');
       $this->loadRoutesFrom(__DIR__.'/routes/web.php');
       $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-      $this->publishes([__DIR__ . '/routes/route.php' =>base_path('routes/solid.php')], 'solidRoutes');
       $this->publishes([
           __DIR__ . '/provider/app.stub' => base_path('app/Providers/SolidAppServiceProvider.php'),
-          __DIR__ . '/provider/model_schema_json.json' => base_path('model_schema_json.json')
-      ], 'solidAppServiceProvider');
+          __DIR__ . '/provider/model_schema_json.json' => base_path('model_schema_json.json'),
+          __DIR__ . '/routes/route.php' =>base_path('routes/solid.php'),
+          __DIR__ . '/app/stubs/config.stub' =>config_path("solid.php")
+      ], 'solid-app');
       $this->commands([solid::class]);
     }
 
