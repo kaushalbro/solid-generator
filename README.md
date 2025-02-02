@@ -144,6 +144,12 @@ Global function :
 
 
 
+# Bugs:
+
+    1. By default, the middlware function are applied in Controller files 
+       you need to remove it manually if you dont use auth and spatie permission package
+
+
 # Sidebar Configuration Documentation
 
 This documentation describes how to use the `SideBar::add() OR route: localhost://sidebar`  method to create a custom sidebar configuration with multiple options, including sub-links, icons, visibility, permissions, and active routes.
