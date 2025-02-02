@@ -1,3 +1,5 @@
+devil999/solidgenerator
+
 Initial Package required: laravel breeze, spatie (for roles, logs, etc,)
 <br>composer require laravel/breeze --dev  php artisan breeze:install blade
 <br>composer require spatie/laravel-permission
