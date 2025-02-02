@@ -30,7 +30,7 @@ class MakeView extends BaseController
         foreach ($model_data as $key => $model)
         {
                 $model_name = $model->model_name;
-                $view_input = $model->view_input;
+                $view_input = $model->view_input??[];
                 $view_folder_path = $view_path.strtolower($model_name);
                 $partial_folder_path = $view_folder_path."/partial";
                 $file_path =base_path($view_folder_path);

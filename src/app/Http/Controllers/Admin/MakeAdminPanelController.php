@@ -69,9 +69,9 @@ class MakeAdminPanelController extends BaseController
                 $dest_path= $admin_path.'/includes/';
                 $include_sub_path= $this->stub_path.'/admin_view/common/'.$file.'.stub';
                 $file_name=$dest_path.$file.'.blade.php';
-                if ($file=="sidebar"){
-                    $this->makeSidebar($this->model_data);
-                }
+//                if ($file=="sidebar"){
+//                    $this->makeSidebar($this->model_data);
+//                }
                 $this->makeFile($file_name, $this->getStubContents($include_sub_path,[]));
             }
             $source_path= $this->stub_path.'/admin_resources.zip';

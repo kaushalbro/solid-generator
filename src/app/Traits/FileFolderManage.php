@@ -1,6 +1,7 @@
 <?php
 namespace Devil\Solidprinciple\app\Traits;
 
+use Illuminate\Support\Facades\Artisan;
 use ZipArchive;
 
 trait FileFolderManage
@@ -11,6 +12,7 @@ trait FileFolderManage
     public function makeDirectory($path)
     {
         try {
+            Artisan::call("optimize:clear");
             $directoryPath= base_path($path);
             $path_array = explode('/', $path);
             $is_directory =  is_dir($directoryPath);
@@ -31,6 +33,7 @@ trait FileFolderManage
     public function makeFile($path, $data=null)
     {
         try {
+            Artisan::call("optimize:clear");
             $filePath= base_path($path);
             $path_array = explode('/', $path);
             $file_name= end($path_array);

@@ -49,8 +49,8 @@
                         </div>
                         <div class="col-9">
                             <div class="text-left">
-                                <span class="brand-text font-weight-bold ">{{\Illuminate\Support\Facades\Auth::user()->name}}</span> <br>
-                                <span class="brand-text font-weight-light">{{\Illuminate\Support\Facades\Auth::user()->email}}</span> <br>
+                                <span class="brand-text font-weight-bold ">{{\Illuminate\Support\Facades\Auth::user()->name??""}}</span> <br>
+                                <span class="brand-text font-weight-light">{{\Illuminate\Support\Facades\Auth::user()->email??""}}</span> <br>
                             </div>
                         </div>
                     </div>

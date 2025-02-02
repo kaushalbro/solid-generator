@@ -2,8 +2,11 @@ Package: devil999/solidgenerator:
 
      Solid Generator generates solid code with controller api resources, custom request, with repo pattern, migrations based on model_schema_json file  with admin panel for blade etc..
      Note: For better result: 
-            Think to design software and write your schema according in model_schema_json.json file formate stored in root path and run solid:make commands 
-
+            Think to design software and write your schema 
+            according in model_schema_json.json file formate stored in root path and run solid:make commands 
+        AdminLte is being used for admin panel/dashboard:
+        Laravel breeze for Auth is necessary:
+        Analyse the output files and complete your project with ease.
 #### For collaboration or contribution: Mail to: official.kaushalg+devil@gmail.com 
 
 Initial Required packages:

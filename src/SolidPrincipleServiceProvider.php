@@ -2,6 +2,7 @@
 namespace Devil\Solidprinciple;
 use Devil\Solidprinciple\app\console\Commands\solid;
 use Devil\Solidprinciple\app\Services\SideBar;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\ServiceProvider;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
@@ -23,7 +24,6 @@ class SolidPrincipleServiceProvider extends ServiceProvider
     {
       if (config("solid.carbon_immutable")) Date::use(CarbonImmutable::class);
       $this->loadViewsFrom(__DIR__.'/../resources/view', 'solid');
-      $this->loadRoutesFrom(__DIR__.'/routes/web.php');
       $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
       $this->publishes([
           __DIR__ . '/provider/app.stub' => base_path('app/Providers/SolidAppServiceProvider.php'),
@@ -31,7 +31,11 @@ class SolidPrincipleServiceProvider extends ServiceProvider
           __DIR__ . '/routes/route.php' =>base_path('routes/solid.php'),
           __DIR__ . '/app/stubs/config.stub' =>config_path("solid.php")
       ], 'solid-app');
-      $this->commands([solid::class]);
+      if (file_exists(base_path('routes/solid.php'))){
+          $this->loadRoutesFrom(base_path('routes/solid.php'));
+      }
+        $this->commands([solid::class]);
+      Artisan::call("optimize:clear");
     }
 
 }

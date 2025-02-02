@@ -23,6 +23,7 @@ class OptionController extends BaseController
     }
     public function chooseOption()
     {
+        Artisan::call("optimize:clear");
         if (!$this->options['config']){
             $this->checkConfig();
         }else{
@@ -100,6 +101,7 @@ class OptionController extends BaseController
                 Artisan::call('solid:make --layout');
                 Artisan::call('solid:make --repo');
                 Artisan::call('solid:make --interface');
+                if ($this->is_api) Artisan::call('solid:make --api');
                 new MakeComponents();
                 new MakeAdminPanelController($data_path);
                 break;

@@ -18,7 +18,7 @@ trait MakeSidebar
         $side_bar_content=[];
         $total_models= count($model_data);
         $destination_file=$this->path('config').'/sidebar.php';
-        $is_exist_destination_file =file_exists($destination_file);
+        $is_exist_destination_file = file_exists($destination_file);
         foreach ($model_data as $key => $model){
             $side_bar = $model->sidebar[0];
             $model_name = ucfirst($model->model_name);
