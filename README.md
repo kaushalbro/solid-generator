@@ -410,4 +410,56 @@ On sidebar:
                          );
          });
 ```
+`Data formate`
+
+````
+[
+  {
+    "model_name": "DemoProduct",
+    "model_attributes": {
+      "db_rules": [
+        "product_code:string|required|unique",
+        "type:enum(inventory,service)|required",
+        "name:string|required",
+        "category_id:foreign_key|required",
+        "sku_code:string|nullable|unique",
+        "brand:string|nullable",
+        "unit:string|required",
+        "units:string|nullable",
+        "description:text|nullable",
+        "status:enum(active,inactive)|required",
+        "variation:boolean|default:false",
+        "image:file|nullable",
+        "supplier_id:foreign_key",
+        "purchase_unit:string|nullable|required",
+        "reorder_threshold_quantity:float|nullable",
+        "selling_price:float|required",
+        "selling_unit:string|nullable|required",
+        "discount_amount:float|nullable"
+      ],
+      "request_rules": [
+        "product_code:required|string|min:2|max:50",
+        "type:required|in:inventory,service",
+        "name:required|string|min:2|max:255",
+        "category_id:required|int",
+        "sku_code:nullable|string|min:2|max:50",
+        "brand:nullable|string|max:100",
+        "unit:required|string|max:50",
+        "units:nullable|string|max:255",
+        "description:nullable|string",
+        "status:required|in:active,inactive",
+        "variation:nullable|boolean",
+        "image:nullable|file|mimes:jpeg,png,jpg|max:2048",
+        "supplier_id:nullable|integer|exists:suppliers,id",
+        "purchase_unit:nullable|string|max:50",
+        "reorder_threshold_quantity:nullable|numeric|min:0",
+        "selling_price:required|numeric|min:0",
+        "selling_unit:nullable|string|max:50",
+        "discount_amount:nullable|numeric|min:0"
+      ]
+    }
+  }
+]
+
+````
 
