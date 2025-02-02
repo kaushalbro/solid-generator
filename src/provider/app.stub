@@ -1,8 +1,6 @@
 <?php
 namespace App\Providers;
 use App\Models\Product;
-use App\Models\Role;
-use App\Models\User;
 use Devil\Solidprinciple\app\Services\SideBar;
 use Devil\Solidprinciple\app\Services\SubLink;
 use Illuminate\Support\ServiceProvider;
@@ -27,10 +25,10 @@ class SolidAppServiceProvider extends ServiceProvider
                 ->group('SETTINGS')
                 ->icon('fa-solid fa-users')
                 ->subLinks(
-                    SubLink::add('Users', User::class)
+                    SubLink::add('Users')
                         ->icon('fa-solid fa-user ')
                         ->route('/admin/users'),
-                    SubLink::add('Roles', Role::class)
+                    SubLink::add('Roles')
                         ->icon('fa-solid fa-user ')
                         ->route('/admin/roles')
                 );
