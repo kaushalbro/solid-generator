@@ -1,6 +1,6 @@
 {
     "name": "devil999/solidgenerator",
-    "description": "Solid Generator generate solid code with controller api resources, custom request, with repo pattern etc..",
+    "description": "Solid Generator generates solid code with controller api resources, custom request, with repo pattern, migrations based on model_schema_json file  with admin panel for blade etc..",
     "type": "library",
     "license": "MIT",
     "autoload": {

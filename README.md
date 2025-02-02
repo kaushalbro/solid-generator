@@ -1,4 +1,10 @@
-Package: devil999/solidgenerator
+Package: devil999/solidgenerator: 
+
+     Solid Generator generates solid code with controller api resources, custom request, with repo pattern, migrations based on model_schema_json file  with admin panel for blade etc..
+     Note: For better result: 
+            Think to design software and write your schema according in model_schema_json.json file formate stored in root path and run solid:make commands 
+
+#### For collaboration or contribution: Mail to: official.kaushalg+devil@gmail.com 
 
 Initial Required packages:
     
@@ -15,7 +21,7 @@ Register Service Provider :
 
     Public solid-generator assets :    php artisan vendor:publish --tag=solid-app
     Globle :   php artisan solid:make --publish
-
+    
 Operations:
     
     Role and permission (options)
@@ -41,6 +47,29 @@ Operations:
 
             Steps: 5) Seed:  UserRolePermissionSeeder; command here <br>  php artisan db:seed --class=UserRolePermissionSeeder
 
+First test command after setup :
+    
+    php artisan solid:make --crud 
+
+    // This will Generates Following files: Example for api enabled and repo design patter, Vary in Configuration you provides
+
+    1. Traits FileManager.php . // to manage file uploading
+    2. Traits Api_Response.php . // to manage api response
+    3. Interfaces SolidInterface.php File. 
+    4. Repositories SolidBaseRepository.php File.
+    5. Models DemoProduct.php File.
+    6. Repositories DemoProductRepository.php File.
+    7. API CreateDemoProductRequest.php File.
+    8. Controllers DemoProductController.php File.
+    9. migrations 2025_02_02_070024_create_demoproducts_table.php File.
+    Resources:  
+        10. DemoProductListResource.php File.
+        11. DemoProductCreateResource.php File.
+        12. DemoProductShowResource.php File.
+        13. DemoProductEditResource.php File.
+        
+    
+    Notice incide configuration file:   'design_pattern'=> "repository", //Design patterns are : none or repository
 
 
 Global function :
@@ -349,27 +378,30 @@ Let me know if you need any further enhancements!
 ### Future Implementation Grouping like this. coming soon...
 
 ```
- SideBar::group('setting',function(){
-             SideBar::add('User Management')
-                 ->icon('fa-solid fa-users')
-                 ->subLinks(
-                     SubLink::add('Users', User::class)
-                         ->icon('fa-solid fa-user ')
-                         ->route('/admin/users'),
-                     SubLink::add('Roles', Role::class)
-                         ->icon('fa-solid fa-user ')
-                         ->route('/admin/roles')
-                 );
-             SideBar::add('User Management')
-                 ->icon('fa-solid fa-users')
-                 ->subLinks(
-                     SubLink::add('Users', User::class)
-                         ->icon('fa-solid fa-user ')
-                         ->route('/admin/users'),
-                     SubLink::add('Roles', Role::class)
-                         ->icon('fa-solid fa-user ')
-                         ->route('/admin/roles')
-                 );
- });
+On App : 
+    Generate factory generator for every model.
+On sidebar: 
+         SideBar::group('setting',function(){
+                     SideBar::add('User Management')
+                         ->icon('fa-solid fa-users')
+                         ->subLinks(
+                             SubLink::add('Users', User::class)
+                                 ->icon('fa-solid fa-user ')
+                                 ->route('/admin/users'),
+                             SubLink::add('Roles', Role::class)
+                                 ->icon('fa-solid fa-user ')
+                                 ->route('/admin/roles')
+                         );
+                     SideBar::add('User Management')
+                         ->icon('fa-solid fa-users')
+                         ->subLinks(
+                             SubLink::add('Users', User::class)
+                                 ->icon('fa-solid fa-user ')
+                                 ->route('/admin/users'),
+                             SubLink::add('Roles', Role::class)
+                                 ->icon('fa-solid fa-user ')
+                                 ->route('/admin/roles')
+                         );
+         });
 ```
 

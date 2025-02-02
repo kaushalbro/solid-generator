@@ -14,13 +14,20 @@ class SolidAppServiceProvider extends ServiceProvider
 //            ->position(1)
 //            ->hide(false)
 //            ->subLinks(
-//                SubLink::add('Add Product')
+//                SubLink::add('Add Product', Product::class)
 //                    ->icon('fa-solid fa-plus')
 //                    ->route('/admin/products/create'),
-//                SubLink::add('List Products')
+//                SubLink::add('List Products',Product::class)
 //                    ->icon('fa-solid fa-list')
 //                    ->route('/admin/products')
+//                    ->icon('fa-solid fa-plus')
+//                SubLink::add('User', User::class)
+//                    ->route('/admin/users'),
+//                SubLink::add('Roles',Role::class)
+//                    ->icon('fa-solid fa-user')
+//                    ->route('/admin/roles')
 //            );
+
          SideBar::add('User Management')
                 ->group('SETTINGS')
                 ->icon('fa-solid fa-users')
