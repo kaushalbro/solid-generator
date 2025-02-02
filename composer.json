@@ -1,6 +1,6 @@
 {
     "name": "devil999/solidgenerator",
-    "description": "this generate solid principle code with controller, custom request, with repo pattern",
+    "description": "Solid Generator generate solid code with controller api resources, custom request, with repo pattern etc..",
     "type": "library",
     "license": "MIT",
     "autoload": {

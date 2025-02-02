@@ -7,10 +7,13 @@ Initial Required packages:
             composer require laravel/breeze --dev  OR php artisan breeze:install blade
             composer require spatie/laravel-permission
 
-laravel 11:
+Register Service Provider :
+    
+    Laravel 11 :
+            Add :    SolidPrincipleServiceProvider::class to bootstrap/providers.php
+        Laravel 10 : Find you self 
 
-    Add :    SolidPrincipleServiceProvider::class to bootstrap/providers.php
-    run :    php artisan vendor:publish --tag=solid-app
+    Public solid-generator assets :    php artisan vendor:publish --tag=solid-app
     Globle :   php artisan solid:make --publish
 
 Operations:
@@ -82,6 +85,7 @@ Global function :
     //         All Directory Name pattern should match the pattern below      //
     //                                                                        //
     ////////////////////////////////////////////////////////////////////////////
+
     'modular_app'=>false, // If the app is built on top of module based system design. (Coming soon...)
     'model_schema_json_path' => base_path("model_schema_json.json"),  // root path/base_path
     'is_api' => true,  // Is this application is developing an api's.
