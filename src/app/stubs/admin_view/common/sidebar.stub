@@ -1,0 +1,83 @@
+@php($uri=request()->getRequestUri())
+@php($is_dashboard=$uri =='/admin/dashboard')
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="/admin/dashboard" class="brand-link">
+        <img src="" alt="Logo" class="brand-image img-circle elevation-3" style="height: 33px;width: 33px;opacity: 1">
+        <span class="brand-text font-weight-light">{{ env('APP_NAME') }}</span>
+    </a>
+    <!-- Services -->
+    <div class="sidebar">
+        <!-- SidebarSearch Form -->
+        <div class="form-inline mt-2">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fas fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Services Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <li class="nav-item {{$is_dashboard?'menu-open':'menu-close'}}">
+                    <a href="#" class="nav-link">
+                        <i class="fa-solid fa-house"></i>
+                        <p>
+                            Dashboard
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item ">
+                            <a href="/admin/dashboard" class="nav-link {{$is_dashboard?'active':''}}"">
+                                <i class="fa-solid fa-star ml-3"></i>
+                                <p>Main</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                 @foreach(app('sidebar') as $key_1 => $group)
+                     @if($key_1 != 'core')
+                        <li class="nav-header">{{$key_1}}</li>
+                     @endif
+                     @foreach(app('sidebar')[$key_1] as $key => $main_link)
+                        @if(!$main_link['hide'] && $main_link['permission'])
+                            <li class="nav-item {{in_array($uri,$main_link['active_on_routes'])?'menu-open':'menu-close'}}">
+                                <a href="#" class="nav-link" data-model="{{$main_link['title']}}">
+                                    <i class="{{$main_link['icon']}}"></i>
+                                    <p>
+                                        {{$main_link['title']}}
+                                        <i class="fas fa-angle-left right"></i>
+                                        @if(!is_null($main_link['total_data']))
+                                            <span class="badge badge-info right">{{$main_link['total_data']}} </span>
+                                        @endif
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    @if(count($main_link['sub_links'])>0)
+                                        @foreach( $main_link['sub_links'] as $key_sub_link => $sub_link)
+                                            @if(!$sub_link['hide'] && $sub_link['permission'])
+                                                <li class="nav-item ml-3" data-model="{{$sub_link['title']}}">
+                                                    <a href="{{$sub_link['redirect_route']}}" class="nav-link {{in_array($uri,$sub_link['active_on_routes'])?'active':''}}">
+                                                        <i class="{{$sub_link['icon']}} mr-2"></i>
+                                                        <p style="font-size: 15px">{{$sub_link['title']}}</p>
+                                                        @if(!is_null($sub_link['total_data']))
+                                                            <span class="badge badge-info right mr-2">{{$sub_link['total_data']}} </span>
+                                                        @endif
+                                                    </a>
+                                                </li>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </ul>
+                            </li>
+                        @endif
+                     @endforeach
+                @endforeach
+            </ul>
+        </nav>
+    </div>
+</aside>

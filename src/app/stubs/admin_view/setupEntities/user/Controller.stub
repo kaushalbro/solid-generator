@@ -1,0 +1,205 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Role;
+use App\Models\User;
+use App\Http\Requests\CreateUserRequest;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use App\Traits\FileManager;
+@if('is_api')
+use App\Traits\Api_Response;
+@else
+use Yajra\DataTables\DataTables;
+@endif
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+@if('laravel_11')
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+@else
+use Illuminate\Support\Facades\Auth;
+@endif
+
+class UserController extends Controller @if('laravel_11')implements HasMiddleware @else @endif
+{
+    use FileManager @if('is_api'),Api_Response  @else @endif;
+    @if('is_api')
+    @else
+    protected $view_path="backend.admin.user.";
+    @endif
+    protected $route_prefix="users";
+    protected $model;
+
+
+    public function __construct()
+    {
+        @if('laravel_10')
+            $this->middleware('auth');
+            $this->middleware(['permission:user-create|user-edit|user-delete'], ['only' => ['show']]);
+            $this->middleware(['permission:user-create'], ['only' => ['create', 'store', 'show']]);
+            $this->middleware(['permission:user-edit'], ['only' => ['edit', 'update', 'show']]);
+            $this->middleware(['permission:user-delete'], ['only' => ['destroy']]);
+            $this->middleware(['permission:user-view'], ['only' => ['index']]);
+         @endif
+            $this->model= new User();
+    }
+    @if('laravel_11')
+    public static function middleware(): array
+        {
+            return [
+                'auth',
+                new Middleware('permission:user-view|user-create|user-edit|user-delete', only: ['show']),
+                new Middleware('permission:user-create', only:['create', 'store', 'show']),
+                new Middleware('permission:user-edit', only:['edit', 'update', 'show']),
+                new Middleware('permission:user-delete', only:['destroy']),
+                new Middleware('permission:user-view', only:['only' => ['index']])
+            ];
+        }
+    @endif
+
+    public function index()
+    {
+        $users=User::with('roles')->get();
+        @if('is_api')
+        return $this->apiFetchResponse('user', $users);
+        @else
+        return view($this->view_path."index",compact('users'));
+        @endif
+    }
+
+    public function getList(Request $request)
+    {
+        $users=User::with('roles')->get();
+             return Datatables::of($users)
+                    ->addIndexColumn()
+                    ->addColumn('action', function($user){
+                        return $this->actionButtons($user);
+                    })
+                    ->rawColumns(['action'])
+                    ->make(true);
+    }
+
+    @if('is_api')
+    @else
+    public function actionButtons($user){
+           $attributes= ['model'=>$user, 'route_prefix'=>$this->route_prefix];
+           return  view('components.actionButtons',compact('attributes'));
+    }
+    @endif
+
+    public function show($id)
+    {
+         $user=User::find($id);
+         @if('is_api')
+         return $this->apiFetchResponse('user', $user);
+         @else
+         return view($this->view_path."show",compact('user'));
+         @endif
+    }
+
+    public function edit($id)
+    {
+          $user=User::with('roles')->find($id);;
+          $roles = Role::all();
+          @if('is_api')
+          return $this->apiFetchResponse('user', $user);
+          @else
+          return view($this->view_path."edit",compact('user','roles'));
+          @endif
+    }
+
+    public function create()
+    {
+        $roles = Role::all();
+        @if('is_api')
+        return $this->apiFetchResponse('user', []);
+        @else
+        return view($this->view_path."create", compact('roles'));
+        @endif
+    }
+
+    public function store(CreateUserRequest $request)
+    {
+      try {
+            DB::beginTransaction();
+            $attributes['image'] = $this->storeOrUpdateFile($request, $this->model);
+            $user = User::create([
+              'name' => $request->name,
+              'email' => $request->email,
+              'password' => Hash::make($request->password),
+            ]);
+            $user->syncRoles((\Spatie\Permission\Models\Role::where('id', (int) $request->role)->first()));
+            event(new Registered($user));
+            DB::commit();
+            @if('is_api')
+            return $this->apiCreatedResponse('user', []);
+            @else
+            return redirect()->route('users.index')->with('success','User Created successfully.');
+            @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to create user: " .$e->getMessage();
+            @if('is_api')
+            return $this->apiErrorResponse($error_message);
+            @else
+            return redirect()->route('users.index')->withInput()->with('failed', $error_message);
+            @endif
+          }
+
+    }
+
+    public function update(CreateUserRequest $request, $id)
+    {
+      try {
+            DB::beginTransaction();
+            $attributes= array_filter($request->only($this->model->getFillable()), function($value, $key)use($request){
+                return $key != 'password';
+            }, ARRAY_FILTER_USE_BOTH);
+            $attributes['image'] = $this->storeOrUpdateFile($request, $this->model::find($id));
+            $user=User::find($id);
+            $user->update($attributes);
+            $user->syncRoles((\Spatie\Permission\Models\Role::where('id', (int) $request->role)->first()));
+            DB::commit();
+             @if('is_api')
+             return $this->apiUpdatedResponse('user', []);
+             @else
+             return redirect()->route('users.index')->with('success','User Updated successfully.');
+             @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to update user: " .$e->getMessage();
+             @if('is_api')
+             return $this->apiErrorResponse($error_message);
+             @else
+             return redirect()->back()->withInput()->with('failed', $error_message);
+             @endif
+          }
+    }
+
+    public function destroy($id)
+    {
+      try {
+            DB::beginTransaction();
+            $user= User::find($id);
+            $user_image=$user->image??'';
+            $user->delete();
+            $this->deleteFile($user_image);
+            DB::commit();
+            @if('is_api')
+            return $this->apiDeletedResponse('user', []);
+            @else
+            return redirect()->route('')->with('success','User deleted successfully.');
+            @endif
+          } catch (\Exception $e) {
+             DB::rollback();
+             $error_message="Failed to delete user: " .$e->getMessage();
+             @if('is_api')
+             return $this->apiErrorResponse($error_message);
+             @else
+             return redirect()->back()->withInput()->with('failed', $error_message);
+             @endif
+          }
+    }
+}

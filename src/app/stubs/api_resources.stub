@@ -1,0 +1,30 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use Carbon\Carbon;
+
+class {{ ResourcesName }}Resource extends JsonResource
+{
+    public function toArray($request): array
+    {
+@if('create')
+     return [
+        'attributes' => $this->attributes ?? []
+        ];
+@else
+     $defaultData = [
+            'id' => $this->id??[],
+            'attributes' => $this->attributes ?? [],
+            'created_at' => Carbon::make($this->created_at)->format('Y-m-d'),
+            'updated_at' => Carbon::make($this->updated_at)->format('Y-m-d')
+         ];
+
+        $data = [
+    {{ data }}
+        ];
+        return array_merge($defaultData, $data) ;
+@endif
+    }
+}

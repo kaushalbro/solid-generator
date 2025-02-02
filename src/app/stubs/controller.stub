@@ -1,0 +1,270 @@
+<?php
+
+namespace {{ namespace }};
+@if('repo_pattern')
+use {{ rootNamespace }}Repositories\{{ classname }}Repository;
+@else
+@endif
+use {{ rootNamespace }}Models\{{ classname }};
+@if('is_api')
+use {{ rootNamespace }}Http\Requests\API\Create{{ classname }}Request;
+@else
+use {{ rootNamespace }}Http\Requests\Create{{ classname }}Request;
+@endif
+@if('is_api_with_api_resource_classes')
+use {{ rootNamespace }}Http\Resources\{{ classname }}\{{ classname }}ListResource;
+use {{ rootNamespace }}Http\Resources\{{ classname }}\{{ classname }}CreateResource;
+use {{ rootNamespace }}Http\Resources\{{ classname }}\{{ classname }}EditResource;
+use {{ rootNamespace }}Http\Resources\{{ classname }}\{{ classname }}ShowResource;
+@else
+@endif
+use App\Traits\FileManager;
+use Illuminate\Support\Facades\DB;
+@if('is_api')
+use App\Traits\Api_Response;
+@else
+use Yajra\DataTables\DataTables;
+@endif
+@if('laravel_11')
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+@else
+@endif
+
+class {{ classname }}Controller extends Controller @if('laravel_11')implements HasMiddleware @else @endif
+{
+    use FileManager @if('is_api'),Api_Response  @else @endif;
+    @if('repo_pattern')
+    protected $repository;
+    @else
+    @endif
+    @if('is_api')
+    @else
+    protected $view_path="backend.admin.{{ viewfolder }}.";
+    @endif
+    protected $model;
+    protected $route_prefix="{{ viewfolder }}s";
+
+    public function __construct()
+    {
+        @if('laravel_10')
+        $this->middleware('auth');
+        $this->middleware(['permission:{{ viewfolder }}-view|{{ viewfolder }}-create|{{ viewfolder }}-edit|{{ viewfolder }}-delete'], ['only' => ['show']]);
+        $this->middleware(['permission:{{ viewfolder }}-create'], ['only' => ['create', 'store', 'show']]);
+        $this->middleware(['permission:{{ viewfolder }}-edit'], ['only' => ['edit', 'update', 'show']]);
+        $this->middleware(['permission:{{ viewfolder }}-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:{{ viewfolder }}-view'], ['only' => ['index']]);
+        @endif
+        $this->model = new {{ classname }}();
+        @if('repo_pattern')
+        $this->repository =  new {{ classname }}Repository($this->model);
+        @else
+        @endif
+    }
+
+    @if('laravel_11')
+    public static function middleware(): array
+        {
+            return [
+                'auth',
+                new Middleware('permission:{{ viewfolder }}-view|{{ viewfolder }}-create|{{ viewfolder }}-edit|{{ viewfolder }}-delete', only: ['show']),
+                new Middleware('permission:{{ viewfolder }}-create', only:['create', 'store', 'show']),
+                new Middleware('permission:{{ viewfolder }}-edit', only:['edit', 'update', 'show']),
+                new Middleware('permission:{{ viewfolder }}-delete', only:['destroy']),
+                new Middleware('permission:{{ viewfolder }}-view', only:['only' => ['index']])
+            ];
+        }
+    @endif
+
+    public function index()
+    {
+        ${{ viewfolder }}_list = $this->getList();
+        @if('is_api')
+        return $this->apiListResponse(${{ viewfolder }}_list);
+        @else
+        return view($this->view_path."index",compact('{{ viewfolder }}_list'));
+        @endif
+    }
+
+    public function getList()
+    {
+        $request=\request();
+        $filter=request("filter");
+        $query = $this->model::query();
+        $limit=50;
+        @if('repo_pattern')
+        ${{ viewfolder }}s =$query->paginate($limit);
+        @else
+        ${{ viewfolder }}s = $query->paginate($limit);
+        @endif
+        @if('is_api')
+        @else
+        return Datatables::of(${{ viewfolder }}s)
+                     ->addIndexColumn()
+                     ->addColumn('action', function(${{ viewfolder }}){
+                                         return $this->actionButtons(${{ viewfolder }});
+                                     })
+                     ->rawColumns(['action'])
+                     ->make(true);
+        @endif
+        @if('is_api_with_api_resource_classes')
+        return {{ classname }}ListResource::collection(${{ viewfolder }}s);
+        @else
+        @endif
+        @if('is_api_without_api_with_resource_classes')
+        return ${{ viewfolder }}s;
+        @endif
+    }
+    @if('is_api')
+    @else
+    public function actionButtons($model){
+        $attributes= ['model'=>$model, 'route_prefix'=>$this->route_prefix];
+        return  view('components.actionButtons',compact('attributes'));
+    }
+    @endif
+
+    public function show($id)
+    {
+        @if('repo_pattern')
+         ${{ viewfolder }}=$this->repository->getById($id);
+        @else
+         ${{ viewfolder }} = {{ classname }}::find($id);
+        @endif
+        @if('is_api')
+        @else
+         return view($this->view_path."show",compact('{{ viewfolder }}'));
+        @endif
+        @if('is_api_with_api_resource_classes')
+        return $this->apiFetchResponse(new {{ classname }}ShowResource(${{ viewfolder }}));
+        @else
+        @endif
+        @if('is_api_without_api_with_resource_classes')
+        return $this->apiFetchResponse(${{ viewfolder }});
+        @endif
+    }
+
+    public function create()
+    {
+    $attributes=[];
+    @if('is_api')
+    @else
+    return view($this->view_path."create", compact('attributes'));
+    @endif
+    @if('is_api_with_api_resource_classes')
+    return $this->apiFetchResponse(new {{ classname }}CreateResource(collect(['attributes'=>$attributes])));
+    @else
+    @endif
+    @if('is_api_without_api_with_resource_classes')
+    return $this->apiFetchResponse($attributes);
+    @endif
+    }
+
+    public function edit($id)
+    {
+        ${{ viewfolder }} = {{ classname }}::find($id);
+        $attributes=[];
+        @if('is_api')
+        @else
+        return view($this->view_path."edit",compact('{{ viewfolder }}'));
+        @endif
+        @if('is_api_with_api_resource_classes')
+        ${{ viewfolder }}->fill(['attributes'=>$attributes]);
+        return $this->apiFetchResponse(new {{ classname }}EditResource(${{ viewfolder }}));
+        @else
+        @endif
+        @if('is_api_without_api_with_resource_classes')
+        return $this->apiFetchResponse($attributes);
+        @endif
+    }
+
+    public function store(Create{{ classname }}Request $request)
+    {
+      try {
+            DB::beginTransaction();
+            $attributes= $request->only($this->model->getFillable());
+            $attributes['image']=$this->storeOrUpdateFile($request, $this->model);
+            @if('repo_pattern')
+            $this->repository->create($attributes);
+            @else
+            {{ classname }}::create($attributes);
+            @endif
+            DB::commit();
+            @if('is_api')
+            return $this->apiCreatedResponse([]);
+            @else
+            return redirect()->back()->with('success', '{{ classname }} created successfully.');
+            @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to create {{ classname }} : " .$e->getMessage();
+            @if('is_api')
+            return $this->apiErrorResponse($error_message);
+            @else
+            return redirect()->route($this->route_prefix.'.index')->withInput()->with('failed', $error_message);
+            @endif
+          }
+
+    }
+
+    public function update(Create{{ classname }}Request $request, $id)
+    {
+      try {
+            DB::beginTransaction();
+            $attributes= $request->only($this->model->getFillable());
+            ${{ classname }}= $this->model::find($id);
+            $attributes['image']=$this->storeOrUpdateFile($request, ${{ classname }});
+            @if('repo_pattern')
+            $this->repository->update($id,$attributes);
+            @else
+            ${{ classname }}->update($attributes);
+            @endif
+            DB::commit();
+            @if('is_api')
+            return $this->apiUpdatedResponse([]);
+            @else
+            return redirect()->route($this->route_prefix.'.index')->with('success','{{ classname }} updated successfully.');
+            @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to update {{ classname }} : " .$e->getMessage();
+            @if('is_api')
+            return $this->apiErrorResponse($error_message);
+            @else
+            return redirect()->route($this->route_prefix.'.index')->withInput()->with('failed',$error_message);
+            @endif
+          }
+    }
+
+    public function destroy($id)
+    {
+      try {
+            DB::beginTransaction();
+            @if('repo_pattern')
+            $this_model= $this->repository->getById($id);
+            @else
+            $this_model= $this->model::find($id);
+            @endif
+            $image= $this_model->image??null;
+            @if('repo_pattern')
+            $this->repository->delete($id);
+            @else
+            $this->model::destroy($id);
+            @endif
+            if ($image && file_exists( base_path("public/".$image)))  unlink($image);
+            DB::commit();
+            @if('is_api')
+            return $this->apiDeletedResponse([]);
+            @else
+            return redirect()->back()->with('success','{{ classname }} deleted successfully.');
+            @endif
+          } catch (\Exception $e) {
+             DB::rollback();
+             $error_message="Failed to delete {{ classname }} : " .$e->getMessage();
+             @if('is_api')
+             return $this->apiErrorResponse($error_message);
+             @else
+             return redirect()->back()->withInput()->with('failed', $error_message);
+             @endif
+          }
+    }
+}

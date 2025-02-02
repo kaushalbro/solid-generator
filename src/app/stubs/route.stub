@@ -1,0 +1,19 @@
+<?php
+
+Route::group([
+    'namespace'  => 'Admin',
+    'prefix'     => '',  // routes beginning with admin/
+    'as'         => '', // named routes
+   // 'middleware' => ['auth', 'admin'],
+], function () {
+      // Admin DashboardController
+      Route::get('/', 'AdminController@index')->name('dashboard');
+      {{ routeName }}
+      // Route::get('account', 'AdminController@account')->name('account');
+      //  Route::post('account', 'AdminController@postAccount')->name('account.update');
+      // Resource Routes
+      // Route::resource('users', 'UsersController');
+
+
+
+});

@@ -1,0 +1,57 @@
+@extends('backend.master')
+@section('title')
+    {{ classname }} | {{ action }}
+@stop
+@section('breadcum')
+    @include('backend.admin.includes.breadcum',['heading'=>"{{ classname }}","sub_heading"=>'{{ action }}'])
+@stop
+@section('content')
+    @include("backend.admin.includes.errors")
+    <div class="row ">
+            <div class="col-12 text-right mb-2">
+                <a href="{{ model_create_route }}" class="btn btn-primary" > Add {{ classname }}</a>
+            </div>
+        <div class="col-12">
+            <table class="table table-bordered datatable">
+                <thead>
+                <tr>
+                    <th width="10px">S.N</th>
+                    {{ table_headers }}
+                    <th width="10%">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+@stop
+@push('scripts')
+<script type="text/javascript">
+    $(function () {
+        $('.datatable').DataTable({
+         serverSide: true,
+         processing: true,
+         order: [[0, 'desc']],
+         ajax:{
+            method: 'GET',
+            url: "{{ datatable_list_route }}",
+            data: function(d) {
+               d.startDate = '';
+               d.endDate = '';
+                },
+                dataType: "JSON",
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                {{ table_header_data }}
+                {data: 'action', name: 'action'},
+            ]
+        });
+    });
+        $(document).ready(function() {
+            $("[name='DataTables_Table_0_length']").css("margin-right", "10px");
+        });
+</script>
+@include("backend.admin.{{ routeprefix }}.script")
+@endpush

@@ -1,0 +1,80 @@
+<?php
+namespace App\Traits;
+use Illuminate\Http\JsonResponse;
+
+trait Api_Response
+{
+
+    // private $headers = ['Content-Type' => 'application/problem+json'];
+
+    public function apiSuccessResponse($data,$message=null) : JsonResponse
+    {
+        $response = ['status' => 200,
+                    'message' => $message ?? 'success',
+                    'data'    => $data,
+                    ];
+        return response()->json($response, 200);
+    }
+
+    public function apiListResponse($data, $message=null) : JsonResponse
+    {
+         $response = ['status' => 200,
+                     'message' => $message??ucfirst($this->model()).' data listed successfully.',
+                     'data'    => $data,
+                     ];
+        return response()->json($response, 200);
+    }
+
+    public function apiCreatedResponse($data, $message=null) : JsonResponse
+    {
+         $response = ['status' => 200,
+                     'message' => $message??ucfirst($this->model()).' created successfully.',
+                     'data'    => $data,
+                     ];
+        return response()->json($response, 200);
+    }
+
+    public function apiUpdatedResponse($data, $message=null) : JsonResponse
+    {
+         $response = ['status' => 200,
+                     'message' => $message??ucfirst($this->model()).' updated successfully.',
+                     'data'    => $data,
+                     ];
+        return response()->json($response, 200);
+    }
+
+    public function apiDeletedResponse($data, $message=null) : JsonResponse
+    {
+         $response = ['status' => 200,
+                     'message' => $message??ucfirst($this->model()).' deleted successfully.',
+                     'data'    => $data,
+                     ];
+        return response()->json($response, 200);
+    }
+
+    public function apiFetchResponse($data, $message=null) : JsonResponse
+    {
+         $response = ['status' => 200,
+                     'message' => $message?? (ucfirst($this->model()).' fetched successfully.'),
+                     'data'    => $data,
+                     ];
+        return response()->json($response, 200);
+    }
+
+    public function apiErrorResponse($error, $errorMessages = [], $code = 400) : JsonResponse
+    {
+        $response = ['status' => $code,
+                     'message' => $error,
+                    ];
+
+        if(!empty($errorMessages)){
+            $response['data'] = $errorMessages;
+        }
+        return response()->json($response, $code);
+    }
+
+    public function model (): string
+    {
+        return isset($this->model)?explode("\\",get_class($this->model))[2]:'';
+    }
+}

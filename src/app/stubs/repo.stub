@@ -1,0 +1,56 @@
+<?php
+namespace {{ namespace }};
+use App\Interfaces\{{ baseInterfaceName }};
+
+class {{ classname }} implements {{ baseInterfaceName }}
+{
+     protected $model;
+
+     public function create(array $attributes){
+        return $this->model->create($attributes);
+     }
+
+     public function update($id, array $attributes){
+        $model = $this->getById($id);
+        $model->update($attributes);
+        return $model;
+     }
+
+     public function updateOrCreate(array $attributes)
+     {
+        return $this->model->updateOrCreate($attributes, $attributes);
+     }
+
+     public function getNext($id)
+     {
+        return $this->model->where('id', '>', $id)->orderBy('id', 'ASC')->first();
+     }
+
+     public function getPrevious($id)
+     {
+             return $this->model->where('id', '<', $id)->orderBy('id', 'DESC')->first();
+     }
+
+     public function delete($id)
+     {
+        return $this->getById($id)->delete();
+     }
+
+     public function getAll(){
+         return $this->model->all();
+     }
+
+     public function getById($id){
+        return $this->model->findOrFail($id);
+     }
+     public function getByIdWith($id, array $with = []){
+        return $this->model->with($with)->where('id', $id)->first();
+     }
+
+      public function getSelectAll()
+      {
+              return $this->model->all()
+                  ->sortBy('name')
+                  ->pluck('name', 'id');
+      }
+}

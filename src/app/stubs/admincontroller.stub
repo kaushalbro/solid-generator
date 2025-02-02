@@ -1,0 +1,20 @@
+<?php
+namespace {{ namespace }};
+use App\Http\Controllers\Controller;
+
+
+
+class {{ classname }}Controller extends Controller
+{
+    public function __construct()
+    {
+
+    }
+
+    public function index()
+    {
+        return view("",compact(''));
+    }
+
+
+}

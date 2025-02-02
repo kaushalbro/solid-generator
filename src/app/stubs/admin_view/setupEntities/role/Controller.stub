@@ -1,0 +1,223 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Permission;
+@if('is_api')
+use App\Traits\Api_Response;
+@else
+use Yajra\DataTables\DataTables;
+@endif
+@if('laravel_11')
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+@else
+use Illuminate\Support\Facades\Auth;
+@endif
+
+class RoleController extends Controller @if('laravel_11')implements HasMiddleware @else @endif
+{
+    @if('is_api') use Api_Response; @else @endif
+    @if('is_api')
+    @else
+    protected $view_path="backend.admin.role.";
+    @endif
+
+    protected $model;
+    protected $route_prefix='roles';
+
+    public function __construct()
+    {
+    @if('laravel_10')
+        $this->middleware('auth');
+        $this->middleware(['permission:role-create|role-view|role-edit|role-delete'], ['only' => ['show']]);
+        $this->middleware(['permission:role-create'], ['only' => ['create', 'store', 'show']]);
+        $this->middleware(['permission:role-edit'], ['only' => ['edit', 'update', 'show']]);
+        $this->middleware(['permission:role-delete'], ['only' => ['destroy']]);
+        $this->middleware(['permission:role-view'], ['only' => ['index']]);
+     @endif
+        $this->model= new Role();
+    }
+
+    @if('laravel_11')
+    public static function middleware(): array
+        {
+            return [
+                'auth',
+                new Middleware('permission:role-view|role-create|role-edit|role-delete', only: ['show']),
+                new Middleware('permission:role-create', only:['create', 'store', 'show']),
+                new Middleware('permission:role-edit', only:['edit', 'update', 'show']),
+                new Middleware('permission:role-delete', only:['destroy']),
+                new Middleware('permission:role-view', only:['only' => ['index']])
+            ];
+        }
+    @endif
+
+    public function index()
+    {
+        $roles=Role::all();
+//        $user= User::find(Auth::id());
+//        dd($user->permissions);
+//        $user->assignRole(41);
+        @if('is_api')
+        return $this->apiFetchResponse('roles', $roles);
+        @else
+        return view($this->view_path."index",compact('roles'));
+        @endif
+    }
+
+    public function getList(Request $request)
+    {
+        $roles=Role::all();
+         return Datatables::of($roles)
+                ->addIndexColumn()
+                ->addColumn('action', function($role){
+                    return $this->actionButtons($role);
+                })
+                ->addColumn('permissions', function($role){
+                   $role=\Spatie\Permission\Models\Role::findByName($role->name);
+                   $total_permission=$role->permissions()->get();
+                   return '<span href="" class="label label-primary">('.$total_permission->count().') '.implode(' | ',$total_permission->pluck('name')->toArray()).'</span>';
+
+                })
+                 ->addColumn('users', function ($role){
+                    $role=\Spatie\Permission\Models\Role::findByName($role->name);
+                    return implode(',',$role->users()->pluck('name')->toArray());
+                 })
+                ->rawColumns(['action','permissions','users'])
+                ->make(true);
+    }
+
+    @if('is_api')
+    @else
+    public function actionButtons($role){
+           $attributes= ['model'=>$role, 'route_prefix'=>$this->route_prefix];
+           return  view('components.actionButtons',compact('attributes'));
+    }
+    @endif
+
+    public function show($id)
+    {
+         $role=\Spatie\Permission\Models\Role::with('users','permissions')->find($id);
+         @if('is_api')
+         return $this->apiFetchResponse('role', $role);
+         @else
+         return view($this->view_path."show",compact('role'));
+         @endif
+    }
+
+    public function edit($id)
+    {
+        $role=\Spatie\Permission\Models\Role::with('permissions')->findOrFail($id);
+        @if('is_api')
+        return $this->apiFetchResponse('role', $role);
+        @else
+        return view($this->view_path."edit",compact('role'));
+        @endif
+    }
+
+    public function create()
+    {
+        @if('is_api')
+        return $this->apiFetchResponse('role', []);
+        @else
+        return view($this->view_path."create");
+        @endif
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:roles,name',
+            'permissions' => 'required',
+        ]);
+      try {
+            DB::beginTransaction();
+            $attributes= $request->only($this->model->getFillable());
+            $role=\Spatie\Permission\Models\Role::create(array_merge($attributes,['guard_name'=>'web']));
+            $permissions=$request->permissions??[];
+            foreach ($permissions as $key=>$permission){
+                if (!Permission::where('name',$key)->get()->first()){
+                    Permission::create(['name' => $key]);
+                }
+            }
+             $role->syncPermissions(array_keys($permissions));
+            DB::commit();
+             @if('is_api')
+             return $this->apiCreatedResponse('role', []);
+             @else
+             return redirect()->route('roles.index')->withInput()->with('success', 'Role created successfully.');
+             @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to create role: " .$e->getMessage();
+            @if('is_api')
+            return $this->apiErrorResponse($error_message);
+            @else
+            return redirect()->back()->withInput()->with('failed', $error_message);
+            @endif
+          }
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required',
+            'permissions' => 'required',
+        ]);
+      try {
+          DB::beginTransaction();
+          $request->merge(['guard_name'=>'web']);
+          $attributes= $request->only($this->model->getFillable());
+          $role= Role::find($id);
+          $role->update($attributes);
+          $permissions=$request->permissions??[];
+          foreach ($permissions as $key=>$permission){
+              if (!Permission::where('name',$key)->get()->first()){
+                  Permission::create(['name' => $key]);
+              }
+          }
+          \Spatie\Permission\Models\Role::find($id)->syncPermissions(array_keys($permissions));
+          \auth()->user()->givePermissionTo(array_keys($permissions));
+            DB::commit();
+           @if('is_api')
+           return $this->apiUpdatedResponse('role', []);
+           @else
+            return redirect()->back()->withInput()->with('success','Role updated successfully.');
+           @endif
+          } catch (\Exception $e) {
+            DB::rollback();
+            $error_message="Failed to update role: " .$e->getMessage();
+            @if('is_api')
+            return $this->apiErrorResponse($error_message);
+            @else
+            return redirect()->back()->withInput()->with('failed', $error_message);
+            @endif
+          }
+    }
+
+    public function destroy($id)
+    {
+      try {
+             DB::beginTransaction();
+             $role= Role::find($id);
+             $role->delete();
+             DB::commit();
+             @if('is_api')
+             return $this->apiDeletedResponse('role', []);
+             @else
+             return redirect()->route('roles.index')->with('success', 'Role deleted successfully');
+             @endif
+          } catch (\Exception $e) {
+             DB::rollback();
+             $error_message="Failed to delete role: " .$e->getMessage();
+             @if('is_api')
+             return $this->apiErrorResponse($error_message);
+             @else
+             return redirect()->back()->withInput()->with('failed', $error_message);
+             @endif
+          }
+    }
+}

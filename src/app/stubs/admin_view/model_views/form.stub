@@ -1,0 +1,5 @@
+@php($is_edit=$type=='edit'?:false)
+<div class="row">
+{{ input }}
+</div>
+@include("backend.admin.includes.form_footer",['type'=>'create'])

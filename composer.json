@@ -1,0 +1,28 @@
+{
+    "name": "devil/solidprinciple",
+    "description": "this generate solid principle code with controller, custom request, with repo pattern",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/app/",
+            "Devil\\Solidprinciple\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "kaushal ghimire",
+            "email": "official.kaushalg+devil@gmail.com"
+        }
+    ],
+
+    "minimum-stability": "dev",
+    "require": {
+      "ext-zip": "*",
+      "ext-dom": "*",
+      "ext-json": "*"
+    }
+}
