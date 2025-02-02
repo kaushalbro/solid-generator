@@ -21,7 +21,9 @@ Register Service Provider :
 
     Public solid-generator assets :    php artisan vendor:publish --tag=solid-app
     Globle :   php artisan solid:make --publish
-    
+
+    Help: php artisan solid:make -h
+
 Operations:
     
     Role and permission (options)
@@ -462,4 +464,23 @@ On sidebar:
 ]
 
 ````
+## For local development
+````
+ Add second line for psr-4 in composer.json file:
+
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/",
+            "Devil\\Solidprinciple\\": "packages/solid-generator/src"
+        }
+    },
+    
+ Then : 
+    php artisan clear-compiled 
+    composer dump-autoload
+    php artisan optimize
+````
+
+
+
 
