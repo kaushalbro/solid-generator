@@ -47,6 +47,7 @@ class MakeModel extends BaseController
             'casts'=>$casts,
             'with'=>$with
           ]);
+        $this->makeDirectory($this->dir_name);
         $this->makeFile($this->dir_name.'/'.$model->model_name.'.php', $contents);
       }
 //      new MakeController(['Admin'], 'Admin');

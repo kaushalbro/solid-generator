@@ -58,6 +58,7 @@ class MakeRequest extends BaseController
                 'rules'=>$rules,
                 'stub_conditions'=>['is_api'=>$this->is_api]
             ]);
+            $this->makeDirectory($this->dir_name);
             $this->makeFile($this->dir_name.'/'.'Create'. ucwords($model->model_name).'Request.php', $contents);
         }
     }
