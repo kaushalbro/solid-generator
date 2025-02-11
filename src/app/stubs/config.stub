@@ -15,7 +15,7 @@ return [
 //                                                                        //
 ////////////////////////////////////////////////////////////////////////////
 
-        'modular_app'=>false, // If the app is built on top of module based system design. (Coming soon...)
+        'modular_app'=>false, // If the app is built on top of module based system design.
 
         'model_schema_json_path' => base_path("model_schema_json.json"),  // root path/base_path
 
