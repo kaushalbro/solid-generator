@@ -20,6 +20,7 @@ use {{ rootNamespace }}Http\Resources\{{ classname }}\{{ classname }}ShowResourc
 @endif
 use App\Traits\FileManager;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
 @if('is_api')
 use App\Traits\Api_Response;
 @else
@@ -88,14 +89,14 @@ class {{ classname }}Controller extends Controller @if('laravel_11')implements H
 
     public function getList()
     {
-        $request=\request();
-        $filter=request("filter");
-        $query = $this->model::query();
-        $limit=50;
+        $limit = request("results")??10;
+        $pageNumber = request('page')??1;
+        $query = $this->searchSortQuery($this->model::query());
+
         @if('repo_pattern')
-        ${{ viewfolder }}s =$query->paginate($limit);
+        ${{ viewfolder }}s = $query->paginate($limit,["*"],"page",$pageNumber);
         @else
-        ${{ viewfolder }}s = $query->paginate($limit);
+        ${{ viewfolder }}s = $query->paginate($limit,["*"],"page",$pageNumber);
         @endif
         @if('is_api')
         @else
@@ -108,7 +109,7 @@ class {{ classname }}Controller extends Controller @if('laravel_11')implements H
                      ->make(true);
         @endif
         @if('is_api_with_api_resource_classes')
-        return {{ classname }}ListResource::collection(${{ viewfolder }}s);
+        return new {{ classname }}ListResource(${{ viewfolder }}s);
         @else
         @endif
         @if('is_api_without_api_with_resource_classes')
@@ -267,4 +268,19 @@ class {{ classname }}Controller extends Controller @if('laravel_11')implements H
              @endif
           }
     }
+
+    public function searchSortQuery(Builder $query)
+     {
+         $cols=request("columns");
+         $search=request("search")??null;
+         $sortOrder= request('sortOrder')=="descend"?"DESC":"ASC"??"DESC";
+         $shortFiled= request('sortField')??null;
+         if (($search && strlen($search)>=2) && $cols){
+             foreach ($cols as $col){
+                 if ($col)$query=$query->orWhere("$col","LIKE", "%$search%");
+             }
+         }
+         if ($shortFiled)$query->orderBy("$shortFiled","$sortOrder");
+         return $query;
+     }
 }

@@ -49,13 +49,17 @@ class MakeApiResources extends BaseController
                     $data.="\n\t".'"'.$text.'" => $this->'.$text.'??[],'."\t\n";
                 }
                 foreach ($this->actionsResourceToGenerate as $action){
+                    $stub = $this->stub_path;
+                    if ($action=="List"){
+                        $stub =  __DIR__.'/../../stubs/api_resource_collection.stub';
+                    }
 //                    try {
 //                        $content=\view("solid::apiResources", compact("data"))->render();
 //                        dd($content);
 //                    }catch (\Exception $exception){
 //                        dd($exception);
 //                    }
-                    $contents =$this->getStubContents($this->stub_path,[
+                    $contents =$this->getStubContents($stub,[
                         'namespace' => $this->namespace.'\\'.ucwords($model->model_name),
                         'classname'=> ucwords($model_name),
                         'ResourcesName'=>ucwords($model->model_name).$action,

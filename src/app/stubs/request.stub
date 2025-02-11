@@ -37,7 +37,7 @@ class Create{{ classname }}Request extends FormRequest
        $errors = $validator->errors();
        $response = response()->json([
            'success'=>false,
-           'message' =>  $errors->messages()
+           'errors' =>  $errors->messages()
            ], 422);
 
        throw new HttpResponseException($response);

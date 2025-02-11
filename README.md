@@ -485,5 +485,37 @@ On sidebar:
 ````
 
 
+### Filter params required from frontend
+````
+ {
+  "results": "10", //limit 
+  "page": "1", 
+  "search": "cat", //searched term
+  "columns": [  // colums for search term  like: $query->where("$col","LIKE", "%$search%");
+    "name",
+    "description",
+    null
+  ],
+  "pagination": {   // Pagination Info
+    "current": "1",
+    "pageSize": "10",
+    "pageSizeOptions": [
+      "10",
+      "20",
+      "25",
+      "50",
+      "100",
+      "1000"
+    ],
+    "showSizeChanger": "true",
+    "tooltip": "false",
+    "total": "514254"  // total data: comes from server
+  },
+  "sortOrder": "descend",   //sort by 
+  "sortField": "name"       //sorting field    
+}
+
+````
+
 
 
