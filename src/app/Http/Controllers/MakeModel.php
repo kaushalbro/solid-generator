@@ -21,6 +21,7 @@ class MakeModel extends BaseController
         $this->model_data_path = $model_data_path;
         $this->stub_path =__DIR__.'/../../stubs/model.stub';
         $this->dir_name= config('solid.model_path')?:$this->dir_name;
+        if ($this->module) $this->dir_name =  "Modules/$this->module/".$this->dir_name;
         $this->make();
     }
 

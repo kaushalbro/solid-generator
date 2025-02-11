@@ -24,6 +24,7 @@ class MakeRequest extends BaseController
             $this->dir_name=$this->dir_name.'/API';
             $this->makeDirectory($this->dir_name);
         }
+        if ($this->module) $this->dir_name =  "Modules/$this->module/".$this->dir_name;
         $this->make();
     }
 

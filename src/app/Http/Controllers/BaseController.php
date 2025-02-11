@@ -3,6 +3,7 @@ namespace Devil\Solidprinciple\app\Http\Controllers;
 
 use Devil\Solidprinciple\app\Traits\HelperTrait;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Session;
 
 class BaseController extends Controller
 {
@@ -16,6 +17,8 @@ class BaseController extends Controller
     public $is_api_with_api_resource_classes;
     public $custom_request;
 
+    public $module;
+
     public function __construct(){
 //        These are stub conditions
         $this->laravel_10 = (int) app()->version() < 11;
@@ -26,6 +29,7 @@ class BaseController extends Controller
         $this->api_with_resource_classes= config('solid.api_with_resource_classes')??false;
         $this->is_api_without_api_with_resource_classes = $this->is_api && !$this->api_with_resource_classes;
         $this->is_api_with_api_resource_classes = $this->is_api?$this->is_api && $this->api_with_resource_classes:$this->is_api;
+        $this->module= Session::get('Module');
     }
 //    public function stubConditions($only=[]): array
 //    {

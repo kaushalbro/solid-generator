@@ -4,6 +4,7 @@ namespace Devil\Solidprinciple\app\Http\Controllers;
 use Devil\Solidprinciple\app\Traits\FileFolderManage;
 use Devil\Solidprinciple\app\Traits\GetStubContents;
 use Facade\FlareClient\View;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 
 class MakeApiResources extends BaseController
@@ -31,8 +32,9 @@ class MakeApiResources extends BaseController
             $this->model_data =$data;
         }
         $this->folder = $folder;
-        $this->stub_path = __DIR__.'/../../stubs/api_resources.stub';;
+        $this->stub_path = __DIR__.'/../../stubs/api_resources.stub';
         $this->dir_name=$folder?($this->dir_name.'/'.$folder):$this->dir_name;
+        if ($this->module) $this->dir_name =  "Modules/$this->module/".$this->dir_name;
         $this->make();
     }
 
@@ -86,7 +88,7 @@ class MakeApiResources extends BaseController
                     'reponame'=> '',
                     'stub_conditions'=>['is_api'=>$this->is_api, 'repo_pattern'=>$this->repo_pattern]
                 ]);
-              $this->makeFile($this->dir_name.'/'.ucwords($this->resource_name).$action.'Resource.php', $contents);
+                $this->makeFile($this->dir_name.'/'.ucwords($this->resource_name).$action.'Resource.php', $contents);
 //                $this->makeFile($this->dir_name.'/'.ucwords($this->resource_name).'Controller.php', $contents);
             };
 

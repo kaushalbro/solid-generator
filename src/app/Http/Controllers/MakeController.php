@@ -3,6 +3,7 @@ namespace Devil\Solidprinciple\app\Http\Controllers;
 
 use Devil\Solidprinciple\app\Traits\FileFolderManage;
 use Devil\Solidprinciple\app\Traits\GetStubContents;
+use Illuminate\Support\Facades\Session;
 use Psy\Util\Str;
 
 class MakeController extends BaseController
@@ -28,7 +29,7 @@ class MakeController extends BaseController
         $this->folder = $folder;
         $this->stub_path = $folder=='Admin'?(__DIR__.'/../../stubs/admincontroller.stub'):(__DIR__.'/../../stubs/controller.stub');;
         $this->dir_name=$folder?($this->dir_name.'/'.$folder):$this->dir_name;
-
+        if ($this->module) $this->dir_name =  "Modules/$this->module/".$this->dir_name;
         $this->make();
     }
 

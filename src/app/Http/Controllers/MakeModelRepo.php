@@ -19,6 +19,7 @@ class MakeModelRepo extends BaseController
         $this->model_data =$data;
         $this->stub_path =__DIR__.'/../../stubs/model-repo.stub';
         $this->dir_name=config("solid.repo_path")?:$this->dir_name;
+        if ($this->module) $this->dir_name =  "Modules/$this->module/".$this->dir_name;
         $this->make();
     }
 
