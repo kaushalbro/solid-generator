@@ -48,7 +48,7 @@ class MakeApiResources extends BaseController
                 $data ="";
                 foreach ($model->model_attributes->db_rules as $key => $rule){
                     $text=explode(':', $rule)[0];
-                    $data.="\n\t".'"'.$text.'" => $this->'.$text.'??[],'."\t\n";
+                    $data.="\n\t".'"'.$text.'" => $this->'.$text.','."\t\n";
                 }
                 foreach ($this->actionsResourceToGenerate as $action){
                     $stub = $this->stub_path;

@@ -9,14 +9,15 @@ class {{ ResourcesName }}Resource extends JsonResource
 {
     public function toArray($request): array
     {
+    $resource = $this->resource->toArray();
 @if('create')
      return [
-        'attributes' => $this->attributes ?? []
+        'attributes' => $resource['attributes'] ?? []
         ];
 @else
      $defaultData = [
             'id' => $this->id??[],
-            'attributes' => $this->attributes ?? [],
+            'attributes' => $resource['attributes'] ?? [],
             'created_at' => Carbon::make($this->created_at)->format('Y-m-d'),
             'updated_at' => Carbon::make($this->updated_at)->format('Y-m-d')
          ];

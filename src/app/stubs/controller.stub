@@ -136,7 +136,8 @@ class {{ classname }}Controller extends Controller @if('laravel_11')implements H
          return view($this->view_path."show",compact('{{ viewfolder }}'));
         @endif
         @if('is_api_with_api_resource_classes')
-        return $this->apiFetchResponse(new {{ classname }}ShowResource(${{ viewfolder }}));
+         if (${{ viewfolder }}) return  $this->apiFetchResponse(new {{ classname }}ShowResource(${{ viewfolder }}));
+              return $this->apiErrorResponse('Not Found',[],404);
         @else
         @endif
         @if('is_api_without_api_with_resource_classes')
@@ -281,12 +282,10 @@ class {{ classname }}Controller extends Controller @if('laravel_11')implements H
              }
          }
          if ($shortFiled)$query->orderBy("$shortFiled","$sortOrder");
-         return $query;
+         return $query->orderBy('created_at', 'desc');
      }
 
     public function commonAttributes(){
-             return [
-
-             ];
+             return [];
     }
 }

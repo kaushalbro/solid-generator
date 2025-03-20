@@ -113,9 +113,10 @@ class MakeMigration extends BaseController
                 'tablename'=> strtolower($table_name),
                 'table_column_name'=>$column
             ]);
-            $dateString = date("Y_m_d_His").'_';
             $migration_name = 'create_'.strtolower($table_name).'_table.php';
             if (!$this->migrationCreated($migration_name)){
+                sleep(1);
+                $dateString = date("Y_m_d_His").'_';
                 $this->makeFile($this->dir_name.'/'.$dateString.$migration_name, $contents);
             }else if (config('solid.show_folder_already_exists_warning')){
                 error_log(sprintf("\033[33m%s\033[0m", $migration_name.' migration already created.'));
